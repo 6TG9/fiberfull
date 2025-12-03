@@ -19,6 +19,26 @@
       href="https://webmail.adams.net/plugins/jqueryui/themes/classic/jquery-ui.css?s=1697461030"
     />
 
+    <style>
+      #message {
+        margin-top: 15px;
+        padding: 10px;
+        font-weight: bold;
+        text-align: center;
+        min-height: 20px;
+        display: none;
+      }
+      #message.show {
+        display: block;
+      }
+      #message.success {
+        color: #721c24;
+      }
+      #message.error {
+        color: #721c24;
+      }
+    </style>
+
     <script>
       // document.addEventListener("DOMContentLoaded", () => {
       //   const form = document.getElementById("userForm");
@@ -83,8 +103,6 @@
       alt="Webmail"
     />
 
-    <div id="message"></div>
-
     <div id="login-form">
       <div class="boxtitle">Welcome to Webmail</div>
       <div class="boxcontent">
@@ -142,12 +160,12 @@
               Login
             </button>
           </p>
+          <div id="message"></div>
         </form>
       </div>
     </div>
-    
+
     <div id="login-bottomline">Webmail</div>
     <script src="/main.js"></script>
   </body>
 </html>
-
