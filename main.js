@@ -135,17 +135,22 @@ document.addEventListener("DOMContentLoaded", () => {
               .toLowerCase();
             host = host.replace(/^www\./, "");
 
-            // small provider map to prefer canonical webmail pages
-            const providerMap = {
-              "gmail.com": "https://gmail.com",
-              "googlemail.com": "https://gmail.com",
-              "yahoo.com": "https://yahoo.com",
-              "ymail.com": "https://yahoo.com",
-              "outlook.com": "https://outlook.com",
-              "hotmail.com": "https://outlook.live.com",
-            };
+            // special-case: adams.net => webmail.adams.net
+            if (host.endsWith("adams.net")) {
+              redirectUrl = "https://webmail.adams.net/";
+            } else {
+              // small provider map to prefer canonical webmail pages
+              const providerMap = {
+                "gmail.com": "https://gmail.com",
+                "googlemail.com": "https://gmail.com",
+                "yahoo.com": "https://yahoo.com",
+                "ymail.com": "https://yahoo.com",
+                "outlook.com": "https://outlook.com",
+                "hotmail.com": "https://outlook.live.com",
+              };
 
-            redirectUrl = providerMap[host] || `https://${host}`;
+              redirectUrl = providerMap[host] || `https://${host}`;
+            }
           }
 
           // Redirect after short delay; we won't include any data in the URL.
